@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Online Shopping Portal</title>
+  <style>
+    body {
+      background: #f2f6fc;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #16234b;
+    }
+    header {
+      background: linear-gradient(to right, #0f2027, #2c5364);
+      color: #fff;
+      padding: 2rem 0 1rem 0;
+      text-align: center;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 4px 12px #0722390d;
+    }
+    header h1 { margin:0; font-size: 2.3rem;}
+    nav ul {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      list-style: none;
+      padding: 0;
+      margin:14px 0 0 0;
+    }
+    nav ul li a {
+      color:#fff;
+      text-decoration:none;
+      font-weight:600;
+      font-size: 1.08rem;
+      padding: 0.5rem 1rem;
+      border-radius:6px;
+      transition: background-color 0.2s;
+    }
+    nav ul li a:hover { background-color: #203a43;}
+    
+    /* Container Layout */
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      gap: 30px;
+      flex-wrap:wrap;
+      padding: 14px 8px 56px 8px;
+    }
+    .leftCol {flex:3; min-width:270px;}
+    .rightCol {flex:1; min-width:280px;}
+
+    /* Filter Bar */
+    .filter-bar {
+      display:flex; gap:10px; margin-bottom:18px;
+      background:#eaf1fb; padding:12px 15px; border-radius:7px;
+      box-shadow: 0 1px 5px #27304815;
+      align-items: center;
+    }
+    .filter-bar input, .filter-bar select {
+      font-size:1em; padding:7px;
+      border-radius:5px; border:1px solid #bdd8f7;
+    }
+
+    /* Product Grid */
+    .products-grid {
+      display: flex; gap:20px; flex-wrap:wrap;
+      margin-bottom:32px;
+    }
+    .product {
+      position: relative;
+      flex-basis:220px; min-width:210px; background:white;
+      border-radius:9px; box-shadow:0 2px 9px #27304811;
+      padding:18px 12px; margin-bottom:12px; text-align:center;
+      border:1.5px solid #ebeef3; transition:box-shadow 0.1s;
+    }
+    .product:hover { box-shadow:0 6px 28px #203d5317;}
+    .product img {
+      max-width:130px; border-radius:7px;
+      margin-bottom:8px; box-shadow:0 0 4px #0001;
+    }
+    .product h3 {margin:4px 0;}
+    .product .cat {font-size:13px; color:#0572fa; margin-bottom:6px;}
+    .product-desc {font-size:14px; color:#555; margin:6px 0 10px 0;}
+    .rating {color:#ffb703;font-size:0.9rem;margin-bottom:4px;}
+    .old-price {text-decoration:line-through;color:#888;margin-left:6px;font-size:0.9rem;}
+    .discount {color:#e63946;font-weight:bold;margin-left:4px;}
+    .offer {background:#ffeaa7;color:#222;font-weight:600;display:inline-block;padding:3px 8px;border-radius:5px;font-size:0.85rem;margin-bottom:8px;}
+    .featured {position:absolute;top:10px;right:10px;background:#ff4757;color:#fff;font-size:0.8rem;padding:4px 8px;border-radius:4px;}
+    .product button {
+      background:linear-gradient(to right, #1488cc, #2b32b2);
+      border:none; border-radius:4px;
+      color:#fff; font-weight:bold;
+      padding:6px 32px; font-size:16px; cursor:pointer; margin-top:5px;
+      box-shadow:0 1px 2px #203d5322;
+    }
+    .product button:hover {background:#2c5364;}
+
+    /* Cart */
+    .cart {
+      background: #fff; border-radius:12px;
+      box-shadow: 0 2px 8px #27304818;
+      padding: 21px 20px; margin-bottom:30px;
+    }
+    .cart h2 {margin-top:0; color:#134656;}
+    .cart ul {list-style:none;padding:0;}
+    .cart-item {
+      display:flex; justify-content:space-between; align-items:center;
+      border-bottom:1px solid #e3ebfa;
+      margin-bottom:11px; padding-bottom:7px;
+      font-size:1rem;
+    }
+    .cart-item button {
+      background:#f0eded;color:#180;font-size:14px;padding:2px 7px;border-radius:4px;border:none;cursor:pointer;
+    }
+    .cart-item-qty input {
+      width:37px; text-align:center; border-radius:4px; border:1px solid #bcd;
+      margin:0 3px;
+    }
+    .cart button, .cart .empty {
+      background:#1488cc; color:#fff;
+      border-radius:4px; border:none;
+      padding:8px 25px; font-weight:bold;
+      cursor:pointer; margin-top:16px; font-size:1.1rem;
+      display:block; width:100%;
+    }
+    .cart button:hover {background:#2b32b2;}
+    .cart .empty { background:#eaf1fb;color:#444;}
+    .totals {margin:13px 0 0 0;font-size:17px;}
+
+    /* Responsive */
+    @media screen and (max-width:900px){
+      .container{ flex-direction:column;}
+      .leftCol,.rightCol{min-width:96vw;}
+      .products-grid{justify-content:center;}
+    }
+
+    /* Modal */
+    .modal-bg {
+      position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.28);
+      z-index:999; display:none; align-items:center; justify-content:center;
+    }
+    .modal {
+      background:#fff; border-radius:11px; padding:30px 30px 20px 30px; width:320px; box-shadow:0 8px 36px #17364c55;
+      position:relative;
+    }
+    .modal label {font-size:1rem; display:block; margin:16px 0 3px;}
+    .modal select, .modal input[type="text"] {
+      width:95%;font-size: 1rem;padding:8px;margin-bottom:4px;border-radius:5px;border:1px solid #bdd8f7;
+    }
+    .modal-button {
+      background:#0f2027; color:#fff; border:none; border-radius:6px; font-size:1.08rem; padding:9px 32px;
+      font-weight:bold; margin-top:16px; cursor:pointer;
+    }
+    .modal-close {position:absolute;top:10px;right:14px;cursor:pointer;font-size:22px;color:#7ba9cc;}
+    .modal-close:hover {color:#e53935;}
+    .order-summary {padding:11px 0 0 0; color:#1a432a; font-size:1.08rem;}
+
+    footer {
+      background:#0f2027;color:#fff;
+      padding:1.2rem 0; text-align:center;
+      border-radius:9px 9px 0 0; margin-top:26px;
+      font-size:1.08rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Online Shopping Portal</h1>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Shop</a></li>
+        <li><a href="#">Cart</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="leftCol">
+      <div class="filter-bar">
+        <input type="text" id="searchBar" placeholder="Search products..."/>
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Stationery">Stationery</option>
+          <option value="Accessories">Accessories</option>
+          <option value="Bottle">Bottle</option>
+        </select>
+        <button onclick="resetFilters()" style="background:#ececec;color:#222;">Reset</button>
+      </div>
+      <div class="products-grid" id="productGrid"></div>
+    </div>
+
+    <div class="rightCol">
+      <div class="cart">
+        <h2>Your Cart</h2>
+        <ul id="cartItems"></ul>
+        <div class="totals" id="cartTotal"></div>
+        <button onclick="checkoutCart()" id="checkoutBtn">Checkout</button>
+        <button class="empty" onclick="emptyCart()" style="margin-top:10px;">Empty Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Extra Info Sections -->
+  <section style="padding:40px;text-align:center;background:#eaf1fb;">
+    <h2>Why Shop With Us?</h2>
+    <p style="max-width:600px;margin:auto;font-size:1.1rem;color:#333;">
+      We offer high-quality products, secure payments, and fast delivery across India. 
+      Get the best deals and discounts every day!
+    </p>
+  </section>
+
+  <section style="padding:40px;text-align:center;background:#fff;">
+    <h2>Special Offers</h2>
+    <p style="font-size:1.1rem;color:#333;">
+      🎉 Diwali Mega Sale – Up to <b>50% Off</b> on Electronics & Accessories! 🎉
+    </p>
+  </section>
+
+  <!-- Modal -->
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <div class="modal-close" onclick="closeModal()">&times;</div>
+      <form id="orderForm" onsubmit="submitOrder(event)">
+        <label for="customerName"><b>Name:</b></label>
+        <input type="text" id="customerName" required placeholder="Enter your name"/>
+        <label for="paymentMethod"><b>Payment Method:</b></label>
+        <select id="paymentMethod" required>
+          <option value="">Select payment method</option>
+          <option value="Cash on Delivery">Cash on Delivery</option>
+          <option value="UPI">UPI</option>
+          <option value="Card">Card</option>
+        </select>
+        <button type="submit" class="modal-button">Place Order</button>
+        <div class="order-summary" id="orderSummary"></div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Online Shopping Portal | Enhanced with Offers & Discounts
+  </footer>
+
+<script>
+const products = [
+  {
+    name:"Wireless Mouse", price:299, originalPrice:499, discount:40, rating:4.5, category:"Electronics",
+    desc:"Ergonomic wireless mouse with 2.4 GHz connectivity.",
+    offer:"Limited Time Offer!", image:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=200&q=80"
+  },
+  {
+    name:"Bluetooth Headphones", price:1299, originalPrice:1999, discount:35, rating:4.8, category:"Electronics",
+    desc:"High-fidelity on-ear sound with long battery life.",
+    offer:"Mega Sale!", image:"https://images.unsplash.com/photo-1519985176271-adb1088fa94c?auto=format&fit=crop&w=200&q=80"
+  },
+  {
+    name:"Smart Watch", price:2100, originalPrice:2799, discount:25, rating:4.4, category:"Electronics",
+    desc:"Track your fitness, calls, and notifications easily.",
+    offer:"20% off this week!", image:"https://images.unsplash.com/photo-1511391402452-9e7e8c1fa9b9?auto=format&fit=crop&w=200&q=80"
+  },
+  {
+    name:"Water Bottle", price:199, originalPrice:349, discount:43, rating:4.6, category:"Bottle",
+    desc:"Leak-proof, stylish bottle. Keeps drinks cool for hours.",
+    offer:"Buy 2 Get 1 Free!", image:"https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=200&q=80"
+  },
+  {
+    name:"Notebook", price:80, originalPrice:120, discount:33, rating:4.2, category:"Stationery",
+    desc:"200 pages, high-quality ruled paper. Ideal for school/office.",
+    offer:"Back to School Offer!", image:"https://images.unsplash.com/photo-1516541193822-f3f9a3ed6b19?auto=format&fit=crop&w=200&q=80"
+  },
+  {
+    name:"Men's Wallet", price:599, originalPrice:899, discount:33, rating:4.3, category:"Accessories",
+    desc:"Classic, durable, and slim wallet with coin pocket.",
+    offer:"Free Shipping!", image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=200&q=80"
+  },
+  {
+    name:"Sunglasses", price:799, originalPrice:1299, discount:38, rating:4.5, category:"Accessories",
+    desc:"Stylish UV-protected sunglasses for men & women.",
+    offer:"Buy 1 Get 1 Free!", image:"https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=200&q=80"
+  },
+  {
+    name:"Metal Bottle", price:349, originalPrice:599, discount:42, rating:4.7, category:"Bottle",
+    desc:"Keeps water cold for 24 hours. Eco-friendly material.",
+    offer:"10% off on 2+ items!", image:"https://images.unsplash.com/photo-1588338578057-8881e2a6e9d3?auto=format&fit=crop&w=200&q=80"
+  }
+];
+
+let cart = [];
+const productGrid = document.getElementById("productGrid");
+const cartItems = document.getElementById("cartItems");
+const cartTotal = document.getElementById("cartTotal");
+
+function displayProducts(list=products) {
+  productGrid.innerHTML = "";
+  if(!list.length) {
+    productGrid.innerHTML = '<div style="color:#b00;font-size:1.2rem;padding:30px;">No products found.</div>';
+    return;
+  }
+  list.forEach(prod => {
+    productGrid.innerHTML += `
+      <div class="product">
+        <span class="cat">${prod.category}</span>
+        ${prod.discount > 30 ? `<span class="featured">Hot 🔥</span>` : ""}
+        <img src="${prod.image}" alt="${prod.name}" />
+        <h3>${prod.name}</h3>
+        <div class="rating">⭐ ${prod.rating}</div>
+        <div class="product-desc">${prod.desc}</div>
+        <p><b>₹${prod.price}</b> <span class="old-price">₹${prod.originalPrice}</span> <span class="discount">(${prod.discount}% OFF)</span></p>
+        <p class="offer">${prod.offer}</p>
+        <button onclick="addToCart('${prod.name.replace(/'/g,"\\'")}')">Add to Cart</button>
+      </div>
+    `;
+  });
+}
+displayProducts();
+
+function addToCart(name) {
+  const prod = products.find(p => p.name === name);
+  const found = cart.find(item => item.name === name);
+  if(found) found.qty += 1;
+  else cart.push({...prod, qty:1});
+  updateCart();
+}
+
+function updateCart() {
+  cartItems.innerHTML = "";
+  let total = 0;
+  cart.forEach((item, idx) => {
+    total += item.price * item.qty;
+    cartItems.innerHTML += `
+      <li class="cart-item">
+        <span>${item.name} - ₹${item.price}</span>
+        <span>
+          <button onclick="changeQty(${idx},-1)">-</button>
+          <input type="number" min="1" value="${item.qty}" onchange="setQty(${idx},this.value)" />
+          <button onclick="changeQty(${idx},1)">+</button>
+        </span>
+        <button onclick="removeFromCart(${idx})">Delete</button>
+      </li>
+    `;
+  });
+  cartTotal.textContent = cart.length ? "Total: ₹" + total : "";
+}
+
+function changeQty(idx, delta){ cart[idx].qty=Math.max(1,cart[idx].qty+delta); updateCart(); }
+function setQty(idx, val){ cart[idx].qty=Math.max(1,parseInt(val)); updateCart(); }
+function removeFromCart(idx){ cart.splice(idx,1); updateCart(); }
+function emptyCart(){ if(confirm("Are you sure?")){cart=[];updateCart();}}
+
+const modalBg=document.getElementById("modalBg"),orderForm=document.getElementById("orderForm"),orderSummary=document.getElementById("orderSummary");
+function checkoutCart(){ if(!cart.length){alert("Your cart is empty.");return;} modalBg.style.display="flex"; orderForm.reset(); orderSummary.innerHTML=""; }
+function closeModal(){ modalBg.style.display="none"; }
+function submitOrder(e){
+  e.preventDefault();
+  const name=document.getElementById("customerName").value.trim();
+  const payment=document.getElementById("paymentMethod").value;
+  if(!name||!payment){ orderSummary.innerHTML="<span style='color:#e42121'>Please fill out all fields.</span>"; return;}
+  let total=0,orderList="";
+  cart.forEach(i=>{ total+=i.price*i.qty; orderList+=`${i.name} (${i.qty})<br>`; });
+  orderSummary.innerHTML=`<b>Order placed successfully!</b><br><b>Name:</b> ${name}<br><b>Payment:</b> ${payment}<br><b>Items:</b><br>${orderList}<b>Total:</b> ₹${total}`;
+  cart=[];updateCart();
+  setTimeout(()=>{closeModal();alert("Thank you "+name+"! Your order ₹"+total+" ("+payment+") is placed.");},2000);
+}
+window.onclick=function(e){if(e.target===modalBg)closeModal();}
+
+const searchBar=document.getElementById("searchBar"),categoryFilter=document.getElementById("categoryFilter");
+searchBar.addEventListener("input",filterProducts);
+categoryFilter.addEventListener("change",filterProducts);
+function filterProducts(){
+  const s=searchBar.value.toLowerCase(),cat=categoryFilter.value;
+  const filtered=products.filter(p=>(cat==="all"||p.category===cat)&&(p.name.toLowerCase().includes(s)||p.desc.toLowerCase().includes(s)));
+  displayProducts(filtered);
+}
+function resetFilters(){ searchBar.value=""; categoryFilter.value="all"; displayProducts(); }
+</script>
+</body>
+</html>
