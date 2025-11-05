@@ -377,6 +377,22 @@ function filterProducts(){
   displayProducts(filtered);
 }
 function resetFilters(){ searchBar.value=""; categoryFilter.value="all"; displayProducts(); }
+ 
+  (function () {
+    const onLoad = function () {
+      const script = document.createElement("script");
+      script.src = "https://recomi-app.powerdrill.ai/RecomiSDK.umd.cjs";
+      script.setAttribute("agentId", "1f5e06e4-0dba-478e-b8cf-e23d8718d38e");
+      script.setAttribute("domain", "https://recomi-app.powerdrill.ai");
+      document.body.appendChild(script);
+    };
+
+    if (document.readyState === "complete") {
+      onLoad();
+    } else {
+      window.addEventListener("load", onLoad);
+    }
+  })();
 </script>
 </body>
 </html>
